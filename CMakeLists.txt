@@ -62,6 +62,8 @@ target_link_libraries(MixCopilotAU
 add_library(mixcopilot_core STATIC
     src/audio/FeatureExtractor.cpp
     src/audio/FeatureExtractor.h
+    src/analysis/MuddyDetector.cpp
+    src/analysis/MuddyDetector.h
 )
 target_include_directories(mixcopilot_core PUBLIC src)
 target_link_libraries(mixcopilot_core PUBLIC juce::juce_audio_basics)
@@ -73,6 +75,7 @@ if(BUILD_TESTING)
 
     add_executable(mixcopilot_tests
         tests/audio/test_feature_extractor.cpp
+        tests/analysis/test_muddy_detector.cpp
     )
     target_link_libraries(mixcopilot_tests PRIVATE mixcopilot_core Catch2::Catch2WithMain)
     catch_discover_tests(mixcopilot_tests)
