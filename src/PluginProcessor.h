@@ -2,6 +2,15 @@
 
 #include <juce_audio_processors/juce_audio_processors.h>
 
+#include "engine/SessionState.h"
+
+enum class ProcessingMode
+{
+    Standard,
+    FastFallback,
+    HardStop
+};
+
 class MixCopilotAudioProcessor final : public juce::AudioProcessor
 {
 public:
@@ -31,6 +40,11 @@ public:
     void getStateInformation(juce::MemoryBlock& destData) override;
     void setStateInformation(const void* data, int sizeInBytes) override;
 
+    ProcessingMode getProcessingModeForElapsedMs(std::int64_t elapsedMs) const;
+
 private:
+    SessionState sessionState;
+    double analysisStartMs { 0.0 };
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MixCopilotAudioProcessor)
 };

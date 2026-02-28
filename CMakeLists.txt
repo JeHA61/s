@@ -68,6 +68,8 @@ add_library(mixcopilot_core STATIC
     src/nlp/IntentParser.h
     src/engine/SuggestionEngine.cpp
     src/engine/SuggestionEngine.h
+    src/engine/SessionState.cpp
+    src/engine/SessionState.h
     src/ui/RationalePanel.cpp
     src/ui/RationalePanel.h
 )
@@ -86,6 +88,7 @@ if(BUILD_TESTING)
         tests/analysis/test_muddy_detector.cpp
         tests/nlp/test_intent_parser.cpp
         tests/engine/test_suggestion_engine.cpp
+        tests/engine/test_session_state.cpp
         tests/ui/test_rationale_format.cpp
     )
     target_link_libraries(mixcopilot_tests PRIVATE mixcopilot_core Catch2::Catch2WithMain)

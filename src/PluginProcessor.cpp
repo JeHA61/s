@@ -60,6 +60,9 @@ void MixCopilotAudioProcessor::changeProgramName(int, const juce::String&)
 
 void MixCopilotAudioProcessor::prepareToPlay(double, int)
 {
+    analysisStartMs = juce::Time::getMillisecondCounterHiRes();
+    sessionState.setOriginalChain({ "InputGain", "EQ", "Compressor", "Limiter" });
+    sessionState.applyChain({ "InputGain", "DynamicEQ", "Compressor", "Limiter" });
 }
 
 void MixCopilotAudioProcessor::releaseResources()
@@ -76,6 +79,21 @@ bool MixCopilotAudioProcessor::isBusesLayoutSupported(const BusesLayout& layouts
 void MixCopilotAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer&)
 {
     juce::ScopedNoDenormals noDenormals;
+
+    const auto elapsedMs = static_cast<std::int64_t>(juce::Time::getMillisecondCounterHiRes() - analysisStartMs);
+    const auto mode = getProcessingModeForElapsedMs(elapsedMs);
+
+    if (mode == ProcessingMode::HardStop)
+    {
+        buffer.clear();
+        return;
+    }
+
+    if (mode == ProcessingMode::FastFallback && sessionState.canRollback())
+    {
+        sessionState.rollback();
+    }
+
     for (auto channel = getTotalNumInputChannels(); channel < getTotalNumOutputChannels(); ++channel)
     {
         buffer.clear(channel, 0, buffer.getNumSamples());
@@ -98,6 +116,21 @@ void MixCopilotAudioProcessor::getStateInformation(juce::MemoryBlock&)
 
 void MixCopilotAudioProcessor::setStateInformation(const void*, int)
 {
+}
+
+ProcessingMode MixCopilotAudioProcessor::getProcessingModeForElapsedMs(std::int64_t elapsedMs) const
+{
+    if (sessionState.exceededHardCap(elapsedMs))
+    {
+        return ProcessingMode::HardStop;
+    }
+
+    if (sessionState.shouldUseFallback(elapsedMs))
+    {
+        return ProcessingMode::FastFallback;
+    }
+
+    return ProcessingMode::Standard;
 }
 
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
