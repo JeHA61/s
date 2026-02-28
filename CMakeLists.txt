@@ -68,9 +68,13 @@ add_library(mixcopilot_core STATIC
     src/nlp/IntentParser.h
     src/engine/SuggestionEngine.cpp
     src/engine/SuggestionEngine.h
+    src/ui/RationalePanel.cpp
+    src/ui/RationalePanel.h
 )
 target_include_directories(mixcopilot_core PUBLIC src)
-target_link_libraries(mixcopilot_core PUBLIC juce::juce_audio_basics)
+target_link_libraries(mixcopilot_core PUBLIC juce::juce_audio_basics juce::juce_gui_basics)
+
+target_link_libraries(MixCopilotAU PRIVATE mixcopilot_core)
 
 include(CTest)
 if(BUILD_TESTING)
@@ -82,6 +86,7 @@ if(BUILD_TESTING)
         tests/analysis/test_muddy_detector.cpp
         tests/nlp/test_intent_parser.cpp
         tests/engine/test_suggestion_engine.cpp
+        tests/ui/test_rationale_format.cpp
     )
     target_link_libraries(mixcopilot_tests PRIVATE mixcopilot_core Catch2::Catch2WithMain)
     catch_discover_tests(mixcopilot_tests)
