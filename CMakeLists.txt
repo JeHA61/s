@@ -66,6 +66,8 @@ add_library(mixcopilot_core STATIC
     src/analysis/MuddyDetector.h
     src/nlp/IntentParser.cpp
     src/nlp/IntentParser.h
+    src/engine/SuggestionEngine.cpp
+    src/engine/SuggestionEngine.h
 )
 target_include_directories(mixcopilot_core PUBLIC src)
 target_link_libraries(mixcopilot_core PUBLIC juce::juce_audio_basics)
@@ -79,6 +81,7 @@ if(BUILD_TESTING)
         tests/audio/test_feature_extractor.cpp
         tests/analysis/test_muddy_detector.cpp
         tests/nlp/test_intent_parser.cpp
+        tests/engine/test_suggestion_engine.cpp
     )
     target_link_libraries(mixcopilot_tests PRIVATE mixcopilot_core Catch2::Catch2WithMain)
     catch_discover_tests(mixcopilot_tests)
