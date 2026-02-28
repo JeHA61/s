@@ -13,7 +13,14 @@ FetchContent_Declare(
     GIT_SHALLOW TRUE
 )
 
-FetchContent_MakeAvailable(juce)
+FetchContent_Declare(
+    Catch2
+    GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+    GIT_TAG v3.8.1
+    GIT_SHALLOW TRUE
+)
+
+FetchContent_MakeAvailable(juce Catch2)
 
 juce_add_plugin(MixCopilotAU
     COMPANY_NAME "MixCopilot"
@@ -51,3 +58,22 @@ target_link_libraries(MixCopilotAU
         juce::juce_recommended_lto_flags
         juce::juce_recommended_warning_flags
 )
+
+add_library(mixcopilot_core STATIC
+    src/audio/FeatureExtractor.cpp
+    src/audio/FeatureExtractor.h
+)
+target_include_directories(mixcopilot_core PUBLIC src)
+target_link_libraries(mixcopilot_core PUBLIC juce::juce_audio_basics)
+
+include(CTest)
+if(BUILD_TESTING)
+    list(APPEND CMAKE_MODULE_PATH "${Catch2_SOURCE_DIR}/extras")
+    include(Catch)
+
+    add_executable(mixcopilot_tests
+        tests/audio/test_feature_extractor.cpp
+    )
+    target_link_libraries(mixcopilot_tests PRIVATE mixcopilot_core Catch2::Catch2WithMain)
+    catch_discover_tests(mixcopilot_tests)
+endif()
