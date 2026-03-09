@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Setup build dir
+        run: |
+          mkdir -p build
+
+      - name: Configure and build
+        run: |
+          cmake -S . -B build -DBUILD_TESTING=ON
+          cmake --build build -j
+
+      - name: Run test + regression (no auval)
+        run: scripts/release/run-validation.sh --skip-regression --skip-auval
+
+      - name: Upload CTest log on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ctest-logs
+          path: build/Testing/Temporary/LastTest.log
+          if-no-files-found: ignore

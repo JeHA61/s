@@ -1,5 +1,7 @@
 # MixCopilot AU
 
+[![CI](https://github.com/JeHA61/s/actions/workflows/ci.yml/badge.svg)](https://github.com/JeHA61/s/actions/workflows/ci.yml)
+
 Conversational mixing co-pilot AU plugin (Logic-first MVP).
 
 This plugin helps home recordists and indie artists make mixing decisions faster by translating sensory language (예: "먹먹함", "몽글몽글") into practical, explainable DSP suggestions.
