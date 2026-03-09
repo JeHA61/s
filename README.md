@@ -1,8 +1,22 @@
 # MixCopilot AU
 
-Logic-first AU plugin scaffold for the conversational mixing copilot MVP.
+Conversational mixing co-pilot AU plugin (Logic-first MVP).
 
-## Build
+This plugin helps home recordists and indie artists make mixing decisions faster by translating sensory language (예: "먹먹함", "몽글몽글") into practical, explainable DSP suggestions.
+
+## Project Status
+- Target: AU plugin for Logic users
+- Workflow goal: 2-minute assisted pass, 5-minute hard limit
+- Current mode: MVP of analysis + intent parsing + rationale UI + safe A/B rollback
+
+## Quickstart
+
+### Prerequisites
+- macOS with Xcode Command Line Tools
+- CMake and a C++ toolchain
+- JUCE submodules/tooling available via CMake
+
+### Build
 
 ```bash
 export PATH="$HOME/Library/Python/3.14/bin:$PATH"
@@ -10,12 +24,37 @@ cmake -S . -B build
 cmake --build build -j
 ```
 
-## Verification
+The build output is written to `build/` and includes: `build/mixcopilot_tests`, AU binary artefacts, and plugin bundle output.
+
+### Verification
 
 ```bash
+# unit tests
 ctest --test-dir build --output-on-failure
+
+# optional audio regression check (requires fixtures + baselines)
 python3 scripts/verify/audio_regression.py --input fixtures --baseline baselines
 ```
 
-For AU host validation details, see:
+If `ctest` is unavailable in your shell environment, run the built test binary directly: `./build/mixcopilot_tests`.
+
+For AU host validation and in-DAW smoke checks, see:
 - `docs/testing/logic-au-validation.md`
+
+## Usage Notes
+- Start with natural-language intent text in the plugin UI (Korean/English phrases supported in MVP).
+- Suggestions include a rationale block explaining why each action is recommended.
+- Use A/B and rollback controls to compare before/after states safely.
+
+## Git
+
+Remote: `git@github.com:JeHA61/s.git`
+
+```bash
+git push -u origin main
+```
+
+## What’s Next
+- Add artist-profile presets and style references
+- Expand explanation fidelity and confidence scoring
+- Improve parameter mapping quality without increasing interaction latency
