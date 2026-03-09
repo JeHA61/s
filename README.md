@@ -51,6 +51,21 @@ scripts/release/run-validation.sh --skip-regression --skip-auval
 For AU host validation and in-DAW smoke checks, see:
 - `docs/testing/logic-au-validation.md`
 
+### Logic Rapid Iteration
+
+```bash
+# Build and install AU only (fastest loop)
+scripts/dev/install-for-logic.sh
+
+# Run tests too, validate with auval, and launch Logic
+scripts/dev/install-for-logic.sh --run-tests --verify-au --open-logic
+```
+
+This script installs/reinstalls:
+- `build/MixCopilotAU_artefacts/AU/MixCopilot.component` -> `~/Library/Audio/Plug-Ins/Components`
+
+Use `--skip-build` when you only want to reinstall an existing build output.
+
 ### Style Presets
 
 Select a preset from the UI dropdown to shape the suggestion style:

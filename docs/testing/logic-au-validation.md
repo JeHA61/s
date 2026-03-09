@@ -6,6 +6,13 @@ The quickest full check is:
 scripts/release/run-validation.sh
 ```
 
+개발용 빠른 실행:
+
+```bash
+scripts/dev/install-for-logic.sh --skip-build
+scripts/dev/install-for-logic.sh --run-tests --verify-au --open-logic
+```
+
 You can also run only part of the pipeline:
 
 ```bash
