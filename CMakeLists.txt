@@ -72,6 +72,8 @@ add_library(mixcopilot_core STATIC
     src/engine/SessionState.h
     src/ui/RationalePanel.cpp
     src/ui/RationalePanel.h
+    src/profile/StyleProfile.cpp
+    src/profile/StyleProfile.h
 )
 target_include_directories(mixcopilot_core PUBLIC src)
 target_link_libraries(mixcopilot_core PUBLIC juce::juce_audio_basics juce::juce_gui_basics)

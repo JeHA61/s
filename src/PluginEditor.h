@@ -6,6 +6,8 @@
 #include "engine/SuggestionEngine.h"
 #include "ui/RationalePanel.h"
 
+#include <vector>
+
 class MixCopilotAudioProcessorEditor final : public juce::AudioProcessorEditor
 {
 public:
@@ -17,17 +19,22 @@ public:
 
 private:
     void runAnalysis();
+    std::string getSelectedStyleId() const;
 
     MixCopilotAudioProcessor& audioProcessor;
     SuggestionEngine suggestionEngine;
 
     juce::TextEditor promptEditor;
+    juce::Label styleLabel;
+    juce::ComboBox styleCombo;
     juce::TextButton analyzeButton { "Analyze" };
     juce::TextButton applyButton { "Apply" };
     juce::TextButton rollbackButton { "Rollback" };
     juce::ToggleButton abToggleButton { "A/B" };
     juce::Label statusLabel;
     RationalePanel rationalePanel;
+
+    std::vector<std::string> presetIds;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MixCopilotAudioProcessorEditor)
 };

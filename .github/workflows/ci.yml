@@ -5,6 +5,13 @@ on:
     branches:
       - main
   pull_request:
+  workflow_dispatch:
+    inputs:
+      run_auval:
+        description: 'Run auval check in this workflow run'
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   build-and-test:
@@ -29,7 +36,11 @@ jobs:
           cmake --build build -j
 
       - name: Run test + regression (no auval)
-        run: scripts/release/run-validation.sh --skip-regression --skip-auval
+        run: scripts/release/run-validation.sh --skip-build --skip-regression --skip-auval
+
+      - name: Optional auval validation
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.run_auval }}
+        run: scripts/release/run-validation.sh --skip-build --skip-tests --skip-regression --install-au
 
       - name: Upload CTest log on failure
         if: always()

@@ -1,6 +1,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include <cmath>
+#include <algorithm>
 
 #include "engine/SuggestionEngine.h"
 
@@ -30,4 +31,19 @@ TEST_CASE("SuggestionEngine returns low-mid rationale and at least one action")
     const auto suggestion = engine.suggest(makeLowMidHeavyBuffer(), "소리가 너무 먹먹해");
     REQUIRE(suggestion.reason.find("low-mid") != std::string::npos);
     REQUIRE(suggestion.actions.size() > 0);
+}
+
+TEST_CASE("SuggestionEngine applies style presets when generating actions")
+{
+    SuggestionEngine engine;
+    const auto warmPop = engine.suggest(makeLowMidHeavyBuffer(), "소리가 너무 먹먹해", 48000.0, "warm-pop");
+    const auto modernPop = engine.suggest(makeLowMidHeavyBuffer(), "소리가 너무 먹먹해", 48000.0, "modern-pop");
+
+    REQUIRE(modernPop.actions.size() == warmPop.actions.size() + 1);
+    REQUIRE(std::find_if(warmPop.actions.begin(), warmPop.actions.end(), [](const SuggestedAction& action) {
+                return action.description.find("Gentle top air") != std::string::npos;
+            }) != warmPop.actions.end());
+    REQUIRE(std::find_if(modernPop.actions.begin(), modernPop.actions.end(), [](const SuggestedAction& action) {
+                return action.description.find("Attack transient") != std::string::npos;
+            }) != modernPop.actions.end());
 }

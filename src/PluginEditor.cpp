@@ -1,6 +1,7 @@
 #include "PluginEditor.h"
 
 #include <cmath>
+#include "profile/StyleProfile.h"
 
 MixCopilotAudioProcessorEditor::MixCopilotAudioProcessorEditor(MixCopilotAudioProcessor& p)
     : AudioProcessorEditor(&p), audioProcessor(p)
@@ -9,6 +10,22 @@ MixCopilotAudioProcessorEditor::MixCopilotAudioProcessorEditor(MixCopilotAudioPr
 
     promptEditor.setText("소리가 너무 먹먹해");
     statusLabel.setText("Ready", juce::dontSendNotification);
+
+    styleLabel.setText("스타일 프리셋", juce::dontSendNotification);
+    styleLabel.setJustificationType(juce::Justification::left);
+
+    presetIds.clear();
+    const auto& profiles = getDefaultStyleProfiles();
+    int presetIndex = 1;
+    for (const auto& profile : profiles)
+    {
+        styleCombo.addItem(profile.label, presetIndex);
+        presetIds.push_back(profile.id);
+        ++presetIndex;
+    }
+    styleCombo.setSelectedId(1);
+    styleCombo.setTooltip("Style context influences suggestion balance and tone.");
+
     statusLabel.setJustificationType(juce::Justification::centredLeft);
 
     analyzeButton.onClick = [this] { runAnalysis(); };
@@ -19,6 +36,8 @@ MixCopilotAudioProcessorEditor::MixCopilotAudioProcessorEditor(MixCopilotAudioPr
     };
 
     addAndMakeVisible(promptEditor);
+    addAndMakeVisible(styleLabel);
+    addAndMakeVisible(styleCombo);
     addAndMakeVisible(analyzeButton);
     addAndMakeVisible(applyButton);
     addAndMakeVisible(rollbackButton);
@@ -45,6 +64,11 @@ void MixCopilotAudioProcessorEditor::resized()
     auto top = bounds.removeFromTop(32);
     juce::ignoreUnused(top);
 
+    auto styleRow = bounds.removeFromTop(28);
+    styleLabel.setBounds(styleRow.removeFromLeft(120));
+    styleCombo.setBounds(styleRow);
+
+    bounds.removeFromTop(8);
     auto inputRow = bounds.removeFromTop(34);
     promptEditor.setBounds(inputRow.removeFromLeft(static_cast<int>(inputRow.getWidth() * 0.65f)));
     analyzeButton.setBounds(inputRow.removeFromLeft(10).removeFromRight(100));
@@ -79,7 +103,23 @@ void MixCopilotAudioProcessorEditor::runAnalysis()
         writePtr[sample] = lowMid + high;
     }
 
-    const auto suggestion = suggestionEngine.suggest(mockBuffer, promptEditor.getText().toStdString(), sampleRate);
+    const auto selectedStyle = getSelectedStyleId();
+    const auto suggestion = suggestionEngine.suggest(
+        mockBuffer,
+        promptEditor.getText().toStdString(),
+        sampleRate,
+        selectedStyle);
     rationalePanel.setSuggestion(suggestion);
-    statusLabel.setText("Suggestion generated. Review and A/B check.", juce::dontSendNotification);
+    statusLabel.setText("Suggestion generated for style. Review and A/B check.", juce::dontSendNotification);
+}
+
+std::string MixCopilotAudioProcessorEditor::getSelectedStyleId() const
+{
+    const auto selectedId = styleCombo.getSelectedId();
+    if (selectedId <= 0 || selectedId > static_cast<int>(presetIds.size()))
+    {
+        return "default";
+    }
+
+    return presetIds[static_cast<std::size_t>(selectedId - 1)];
 }

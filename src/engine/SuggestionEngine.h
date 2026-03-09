@@ -21,5 +21,9 @@ struct Suggestion
 class SuggestionEngine
 {
 public:
-    Suggestion suggest(const juce::AudioBuffer<float>& buffer, const std::string& prompt, double sampleRate = 48000.0) const;
+    Suggestion suggest(
+        const juce::AudioBuffer<float>& buffer,
+        const std::string& prompt,
+        double sampleRate = 48000.0,
+        const std::string& styleId = "default") const;
 };

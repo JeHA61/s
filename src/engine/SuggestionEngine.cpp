@@ -2,16 +2,20 @@
 
 #include "analysis/MuddyDetector.h"
 #include "nlp/IntentParser.h"
+#include "profile/StyleProfile.h"
 
 #include <algorithm>
 
-Suggestion SuggestionEngine::suggest(const juce::AudioBuffer<float>& buffer, const std::string& prompt, double sampleRate) const
+Suggestion SuggestionEngine::suggest(const juce::AudioBuffer<float>& buffer, const std::string& prompt, double sampleRate, const std::string& styleId) const
 {
     IntentParser parser;
     MuddyDetector detector;
 
     const auto intent = parser.parse(prompt);
     const auto muddyScore = detector.score(buffer, sampleRate);
+    const auto* style = findStyleProfile(styleId);
+
+    const auto profileHint = style != nullptr ? style->toneHint : getDefaultStyleProfiles().front().toneHint;
 
     Suggestion suggestion;
     suggestion.confidence = std::clamp((intent.confidence + muddyScore) * 0.5f, 0.0f, 1.0f);
@@ -19,19 +23,45 @@ Suggestion SuggestionEngine::suggest(const juce::AudioBuffer<float>& buffer, con
     if (intent.intent == Intent::ReduceMuddiness || muddyScore > 0.65f)
     {
         suggestion.reason = "Detected low-mid crowding and masking risk.";
-        suggestion.impact = "Expected result: tighter low end and clearer presence.";
+        suggestion.impact = "Expected result: tighter low end and clearer presence for a " + profileHint + " direction.";
         suggestion.actions.push_back({ "Bell EQ: -2.5 dB @ 280 Hz (Q 1.2)" });
         suggestion.actions.push_back({ "Dynamic EQ: 250-450 Hz, -1.5 dB on peaks" });
         suggestion.actions.push_back({ "Transient emphasis: +5%" });
+
+        if (style != nullptr && style->id == "warm-pop")
+        {
+            suggestion.actions.push_back({ "Gentle top air: +0.8 dB @ 9 kHz" });
+        }
+        else if (style != nullptr && style->id == "modern-pop")
+        {
+            suggestion.actions.push_back({ "Attack transient: +7%, release +4%" });
+            suggestion.actions.push_back({ "Dynamic shelf: -1 dB @ 300 Hz" });
+        }
+        else if (style != nullptr && style->id == "indie-acoustic")
+        {
+            suggestion.actions.push_back({ "Soft tape tone: +0.4% saturation" });
+            suggestion.actions.push_back({ "Air control: -1 dB @ 12 kHz" });
+        }
+
         return suggestion;
     }
 
     if (intent.intent == Intent::IncreaseClarity)
     {
         suggestion.reason = "Detected clarity intent with moderate low-mid pressure.";
-        suggestion.impact = "Expected result: improved articulation and definition.";
+        suggestion.impact = "Expected result: improved articulation and definition in a " + profileHint + " direction.";
         suggestion.actions.push_back({ "Presence shelf: +1.5 dB @ 4.5 kHz" });
         suggestion.actions.push_back({ "Low-mid cleanup: -1.0 dB @ 320 Hz" });
+
+        if (style != nullptr && style->id == "modern-pop")
+        {
+            suggestion.actions.push_back({ "High shelf: +1.0 dB @ 9 kHz" });
+        }
+        else if (style != nullptr && style->id == "indie-acoustic")
+        {
+            suggestion.actions.push_back({ "Micro dynamics: smoother 2.5:1" });
+        }
+
         return suggestion;
     }
 

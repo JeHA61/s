@@ -10,6 +10,7 @@ This plugin helps home recordists and indie artists make mixing decisions faster
 - Target: AU plugin for Logic users
 - Workflow goal: 2-minute assisted pass, 5-minute hard limit
 - Current mode: MVP of analysis + intent parsing + rationale UI + safe A/B rollback
+- Style presets: Warm Pop / Modern Pop / Indie Acoustic (MVP)
 
 ## Quickstart
 
@@ -49,6 +50,14 @@ scripts/release/run-validation.sh --skip-regression --skip-auval
 
 For AU host validation and in-DAW smoke checks, see:
 - `docs/testing/logic-au-validation.md`
+
+### Style Presets
+
+Select a preset from the UI dropdown to shape the suggestion style:
+
+- Warm Pop: cleaner low-mid control with gentle top lift
+- Modern Pop: tighter transients and brighter presence
+- Indie Acoustic: softer, tape-like movement and controlled air
 
 ## Usage Notes
 - Start with natural-language intent text in the plugin UI (Korean/English phrases supported in MVP).
