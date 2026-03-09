@@ -1,5 +1,7 @@
 #pragma once
 
+#include <atomic>
+
 #include <juce_audio_processors/juce_audio_processors.h>
 
 #include "engine/SessionState.h"
@@ -21,6 +23,8 @@ public:
     void releaseResources() override;
     bool isBusesLayoutSupported(const BusesLayout& layouts) const override;
     void processBlock(juce::AudioBuffer<float>&, juce::MidiBuffer&) override;
+    void setUserBypassed(bool shouldBypass);
+    bool isUserBypassed() const;
 
     juce::AudioProcessorEditor* createEditor() override;
     bool hasEditor() const override;
@@ -44,6 +48,7 @@ public:
 
 private:
     SessionState sessionState;
+    std::atomic<bool> userBypassed { false };
     double analysisStartMs { 0.0 };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MixCopilotAudioProcessor)

@@ -30,7 +30,7 @@ private:
     juce::TextButton analyzeButton { "Analyze" };
     juce::TextButton applyButton { "Apply" };
     juce::TextButton rollbackButton { "Rollback" };
-    juce::ToggleButton abToggleButton { "A/B" };
+    juce::ToggleButton bypassButton { "Bypass" };
     juce::Label statusLabel;
     RationalePanel rationalePanel;
 

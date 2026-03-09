@@ -65,6 +65,16 @@ void MixCopilotAudioProcessor::prepareToPlay(double, int)
     sessionState.applyChain({ "InputGain", "DynamicEQ", "Compressor", "Limiter" });
 }
 
+void MixCopilotAudioProcessor::setUserBypassed(bool shouldBypass)
+{
+    userBypassed.store(shouldBypass, std::memory_order_release);
+}
+
+bool MixCopilotAudioProcessor::isUserBypassed() const
+{
+    return userBypassed.load(std::memory_order_acquire);
+}
+
 void MixCopilotAudioProcessor::releaseResources()
 {
 }
@@ -79,6 +89,15 @@ bool MixCopilotAudioProcessor::isBusesLayoutSupported(const BusesLayout& layouts
 void MixCopilotAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer&)
 {
     juce::ScopedNoDenormals noDenormals;
+
+    if (isUserBypassed())
+    {
+        for (auto channel = getTotalNumInputChannels(); channel < getTotalNumOutputChannels(); ++channel)
+        {
+            buffer.clear(channel, 0, buffer.getNumSamples());
+        }
+        return;
+    }
 
     const auto elapsedMs = static_cast<std::int64_t>(juce::Time::getMillisecondCounterHiRes() - analysisStartMs);
     const auto mode = getProcessingModeForElapsedMs(elapsedMs);

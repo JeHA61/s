@@ -6,8 +6,6 @@
 MixCopilotAudioProcessorEditor::MixCopilotAudioProcessorEditor(MixCopilotAudioProcessor& p)
     : AudioProcessorEditor(&p), audioProcessor(p)
 {
-    juce::ignoreUnused(audioProcessor);
-
     promptEditor.setText("소리가 너무 먹먹해");
     statusLabel.setText("Ready", juce::dontSendNotification);
 
@@ -31,8 +29,9 @@ MixCopilotAudioProcessorEditor::MixCopilotAudioProcessorEditor(MixCopilotAudioPr
     analyzeButton.onClick = [this] { runAnalysis(); };
     applyButton.onClick = [this] { statusLabel.setText("Applied suggestion.", juce::dontSendNotification); };
     rollbackButton.onClick = [this] { statusLabel.setText("Rolled back to previous state.", juce::dontSendNotification); };
-    abToggleButton.onClick = [this] {
-        statusLabel.setText(abToggleButton.getToggleState() ? "A/B: B" : "A/B: A", juce::dontSendNotification);
+    bypassButton.onClick = [this] {
+        audioProcessor.setUserBypassed(bypassButton.getToggleState());
+        statusLabel.setText(bypassButton.getToggleState() ? "Bypass ON (Original)" : "Bypass OFF (Assisted)", juce::dontSendNotification);
     };
 
     addAndMakeVisible(promptEditor);
@@ -41,7 +40,7 @@ MixCopilotAudioProcessorEditor::MixCopilotAudioProcessorEditor(MixCopilotAudioPr
     addAndMakeVisible(analyzeButton);
     addAndMakeVisible(applyButton);
     addAndMakeVisible(rollbackButton);
-    addAndMakeVisible(abToggleButton);
+    addAndMakeVisible(bypassButton);
     addAndMakeVisible(statusLabel);
     addAndMakeVisible(rationalePanel);
 
@@ -72,7 +71,7 @@ void MixCopilotAudioProcessorEditor::resized()
     auto inputRow = bounds.removeFromTop(34);
     promptEditor.setBounds(inputRow.removeFromLeft(static_cast<int>(inputRow.getWidth() * 0.65f)));
     analyzeButton.setBounds(inputRow.removeFromLeft(10).removeFromRight(100));
-    abToggleButton.setBounds(inputRow.removeFromRight(70));
+    bypassButton.setBounds(inputRow.removeFromRight(85));
 
     bounds.removeFromTop(10);
     auto statusRow = bounds.removeFromTop(24);
@@ -110,7 +109,7 @@ void MixCopilotAudioProcessorEditor::runAnalysis()
         sampleRate,
         selectedStyle);
     rationalePanel.setSuggestion(suggestion);
-    statusLabel.setText("Suggestion generated for style. Review and A/B check.", juce::dontSendNotification);
+    statusLabel.setText("Suggestion generated for style. Toggle bypass to compare.", juce::dontSendNotification);
 }
 
 std::string MixCopilotAudioProcessorEditor::getSelectedStyleId() const

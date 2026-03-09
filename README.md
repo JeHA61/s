@@ -9,7 +9,7 @@ This plugin helps home recordists and indie artists make mixing decisions faster
 ## Project Status
 - Target: AU plugin for Logic users
 - Workflow goal: 2-minute assisted pass, 5-minute hard limit
-- Current mode: MVP of analysis + intent parsing + rationale UI + safe A/B rollback
+- Current mode: MVP of analysis + intent parsing + rationale UI + safe rollback and bypass compare
 - Style presets: Warm Pop / Modern Pop / Indie Acoustic (MVP)
 
 ## Quickstart
@@ -77,7 +77,7 @@ Select a preset from the UI dropdown to shape the suggestion style:
 ## Usage Notes
 - Start with natural-language intent text in the plugin UI (Korean/English phrases supported in MVP).
 - Suggestions include a rationale block explaining why each action is recommended.
-- Use A/B and rollback controls to compare before/after states safely.
+- Use rollback and Bypass controls to compare assisted vs original states safely.
 
 ## Git
 
