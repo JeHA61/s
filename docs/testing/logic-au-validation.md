@@ -1,5 +1,17 @@
 # Logic AU Validation Checklist
 
+The quickest full check is:
+
+```bash
+scripts/release/run-validation.sh
+```
+
+You can also run only part of the pipeline:
+
+```bash
+scripts/release/run-validation.sh --skip-regression --skip-auval
+```
+
 ## 1) Build AU component
 
 ```bash

@@ -20,23 +20,30 @@ This plugin helps home recordists and indie artists make mixing decisions faster
 
 ```bash
 export PATH="$HOME/Library/Python/3.14/bin:$PATH"
-cmake -S . -B build
-cmake --build build -j
+scripts/release/run-validation.sh
 ```
+
+The script builds the project, runs tests, and optionally runs audio regression + auval checks.
 
 The build output is written to `build/` and includes: `build/mixcopilot_tests`, AU binary artefacts, and plugin bundle output.
 
 ### Verification
 
 ```bash
-# unit tests
-ctest --test-dir build --output-on-failure
+# quick validation
+scripts/release/run-validation.sh
 
 # optional audio regression check (requires fixtures + baselines)
 python3 scripts/verify/audio_regression.py --input fixtures --baseline baselines
 ```
 
 If `ctest` is unavailable in your shell environment, run the built test binary directly: `./build/mixcopilot_tests`.
+
+To validate only parts:
+
+```bash
+scripts/release/run-validation.sh --skip-regression --skip-auval
+```
 
 For AU host validation and in-DAW smoke checks, see:
 - `docs/testing/logic-au-validation.md`
