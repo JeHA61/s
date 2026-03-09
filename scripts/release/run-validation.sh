@@ -128,10 +128,10 @@ if [[ "$SKIP_AUVAL" == "0" ]]; then
     if [[ "$INSTALL_AU" == "1" ]]; then
       INSTALL_DIR="$HOME/Library/Audio/Plug-Ins/Components"
       run_step "  install to user AU directory" mkdir -p "$INSTALL_DIR" && cp -R "$COMPONENT_DIR" "$INSTALL_DIR/"
-      run_step "  validate (auval)" auval -v aufx MXC1 MxCp
+      run_step "  validate (auval)" auval -v aufx MXC1 MXCP
       run_step "  cleanup temp install" rm -rf "$INSTALL_DIR/MixCopilot.component"
     else
-      run_step "  validate (auval)" auval -v aufx MXC1 MxCp
+      run_step "  validate (auval)" auval -v aufx MXC1 MXCP
     fi
   else
     log "  skipped (auval binary or component not available)"

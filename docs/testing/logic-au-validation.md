@@ -30,7 +30,7 @@ cp -R build/MixCopilotAU_artefacts/AU/MixCopilot.component ~/Library/Audio/Plug-
 ## 3) Validate with auval
 
 ```bash
-auval -v aufx MxC1 MxCp
+auval -v aufx MXC1 MXCP
 ```
 
 Expected:
